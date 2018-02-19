@@ -6,7 +6,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+public class BasicQuery {
+
     public List<Product> select(Connection conn, String sql, String className) throws Exception {
 
         try (Statement stmt = conn.createStatement()) {
