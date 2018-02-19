@@ -1,4 +1,4 @@
-public class Products {
+public class Product {
     private int pid;
     private String name;
     private int price;
@@ -9,7 +9,7 @@ public class Products {
 
     @Override
     public String toString() {
-        return "Products{" +
+        return "Product{" +
                 "pid=" + pid +
                 ", name='" + name + '\'' +
                 ", price=" + price +
