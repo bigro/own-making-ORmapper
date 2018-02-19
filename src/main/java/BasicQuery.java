@@ -1,14 +1,17 @@
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BasicQuery {
 
     public <T> List<T> select(Connection conn, String sql, Class<T> clazz) throws Exception {
+
+        try {
+            conn.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         try (Statement stmt = conn.createStatement();
              ResultSet resultSet = stmt.executeQuery(sql)) {
@@ -36,7 +39,10 @@ public class BasicQuery {
                 objects.add(object);
             }
 
+            conn.commit();
             return objects;
+        } catch (SQLException e) {
+            throw new SQLException(e);
         }
     }
 }

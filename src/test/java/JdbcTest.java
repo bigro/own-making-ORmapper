@@ -17,6 +17,8 @@ public class JdbcTest {
             prepare(stmt);
 
             String sql = "SELECT * FROM products WHERE price >= 100";
+            // INSERTでこけることを確認する場合こっち
+//            String sql = "INSERT INTO products VALUES(4, 'AAA', 100)";
             BasicQuery basicQuery = new BasicQuery();
             List<Product> products = basicQuery.select(conn, sql, Product.class);
             products.forEach(System.out::println);
