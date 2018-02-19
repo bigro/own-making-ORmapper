@@ -1,3 +1,4 @@
+import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -13,10 +14,8 @@ public class JdbcTest {
 
     @Test
     public void name() throws Exception {
-        try (
-                Connection conn = DriverManager.getConnection("jdbc:postgresql://" + hostname
-                        + ":5432/" + dbname, username, password);
-                Statement stmt = conn.createStatement()
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()
         ) {
 
             prepare(stmt);
@@ -59,6 +58,57 @@ public class JdbcTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void mapping() throws Exception {
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT * FROM products WHERE price >= 100";
+            Products products = select(conn, sql, Products.class.getSimpleName());
+            System.out.println(products);
+        }
+    }
+
+    private Products select(Connection conn, String sql, String className) throws Exception {
+
+        try (Statement stmt = conn.createStatement()) {
+
+            prepare(stmt);
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            Products product = new Products();
+
+            while (rs.next()) {
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                Class clazz = Class.forName(className);
+                Object obj = clazz.newInstance();
+
+                for (int i = 1; i <= columnCount; i++) {
+
+                    String columnLabel = metaData.getColumnLabel(i);
+
+                    Field field = clazz.getDeclaredField(columnLabel);
+
+                    field.setAccessible(true);
+                    Object object1 = rs.getObject(i);
+
+                    field.set(obj, object1);
+                }
+                product = (Products) obj;
+            }
+            rs.close();
+
+            stmt.executeUpdate("DROP TABLE products");
+
+            return product;
+        }
+    }
+
+    private Connection getConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:postgresql://" + hostname + ":5432/" + dbname, username, password);
     }
 
     private void prepare(Statement stmt) throws SQLException {
