@@ -2,6 +2,8 @@ import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JdbcTest {
     String hostname = "localhost"; // 自分のものに書き換える
@@ -22,24 +24,33 @@ public class JdbcTest {
             ResultSet rs = stmt
                     .executeQuery("SELECT * FROM products WHERE price >= 100");
             System.out.println("選択");
+
+            List<Products> products = new ArrayList<>();
+
             while (rs.next()) {
                 ResultSetMetaData metaData = rs.getMetaData();
-                String columnLabel = metaData.getColumnLabel(1);
                 int columnCount = metaData.getColumnCount();
+
+                Products product = new Products();
+                Class clazz = Class.forName("Products");
+                Object obj = clazz.newInstance();
+
                 for (int i = 1; i <= columnCount; i++) {
-                    Class clazz = Class.forName("Products");
-                    Object obj = clazz.newInstance();
+
+                    String columnLabel = metaData.getColumnLabel(i);
+
                     //フィールド取得
                     Field field = clazz.getDeclaredField(columnLabel);
+
                     //アクセス可能にする
                     field.setAccessible(true);
-                    Object object1 = rs.getObject(1);
+                    Object object1 = rs.getObject(i);
+
                     //フィールドにセットする
                     field.set(obj, object1);
-                    Products products = (Products) obj;
-
-                    System.out.println(columnLabel);
                 }
+                product = (Products) obj;
+                System.out.println(product);
             }
             rs.close();
 

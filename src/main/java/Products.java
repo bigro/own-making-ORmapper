@@ -6,4 +6,13 @@ public class Products {
     public int pid() {
         return pid;
     }
+
+    @Override
+    public String toString() {
+        return "Products{" +
+                "pid=" + pid +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                '}';
+    }
 }
