@@ -1,0 +1,5 @@
+DROP DATABASE IF EXISTS hello_database;
+DROP ROLE IF EXISTS hello;
+CREATE DATABASE hello_database;
+CREATE ROLE hello WITH LOGIN PASSWORD 'abcdef';
+GRANT ALL ON DATABASE hello_database TO hello;

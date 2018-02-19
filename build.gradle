@@ -1,0 +1,12 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    runtime 'org.postgresql:postgresql:42.2.1'
+    testCompile 'junit:junit:4.12'
+}
+
+repositories {
+    jcenter()
+}
