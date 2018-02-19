@@ -13,54 +13,6 @@ public class JdbcTest {
     String password = "abcdef"; // 自分のものに書き換える
 
     @Test
-    public void name() throws Exception {
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()
-        ) {
-
-            prepare(stmt);
-
-            ResultSet rs = stmt
-                    .executeQuery("SELECT * FROM products WHERE price >= 100");
-            System.out.println("選択");
-
-            List<Products> products = new ArrayList<>();
-
-            while (rs.next()) {
-                ResultSetMetaData metaData = rs.getMetaData();
-                int columnCount = metaData.getColumnCount();
-
-                Products product = new Products();
-                Class clazz = Class.forName("Products");
-                Object obj = clazz.newInstance();
-
-                for (int i = 1; i <= columnCount; i++) {
-
-                    String columnLabel = metaData.getColumnLabel(i);
-
-                    //フィールド取得
-                    Field field = clazz.getDeclaredField(columnLabel);
-
-                    //アクセス可能にする
-                    field.setAccessible(true);
-                    Object object1 = rs.getObject(i);
-
-                    //フィールドにセットする
-                    field.set(obj, object1);
-                }
-                product = (Products) obj;
-                System.out.println(product);
-            }
-            rs.close();
-
-            stmt.executeUpdate("DROP TABLE products");
-            System.out.println("テーブル削除");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void mapping() throws Exception {
         try (Connection conn = getConnection()) {
             String sql = "SELECT * FROM products WHERE price >= 100";
