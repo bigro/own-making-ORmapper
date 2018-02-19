@@ -18,7 +18,7 @@ public class JdbcTest {
 
             String sql = "SELECT * FROM products WHERE price >= 100";
             BasicQuery basicQuery = new BasicQuery();
-            List<Product> products = basicQuery.select(conn, sql, Product.class.getSimpleName());
+            List<Product> products = basicQuery.select(conn, sql, Product.class);
             products.forEach(System.out::println);
         }
     }

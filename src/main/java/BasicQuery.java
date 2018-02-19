@@ -8,38 +8,35 @@ import java.util.List;
 
 public class BasicQuery {
 
-    public List<Product> select(Connection conn, String sql, String className) throws Exception {
+    public <T> List<T> select(Connection conn, String sql, Class<T> clazz) throws Exception {
 
-        try (Statement stmt = conn.createStatement()) {
+        try (Statement stmt = conn.createStatement();
+             ResultSet resultSet = stmt.executeQuery(sql)) {
 
-            ResultSet rs = stmt.executeQuery(sql);
+            T object = null;
+            List<T> objects = new ArrayList<>();
 
-            Product product = new Product();
-            List<Product> products = new ArrayList<>();
-            while (rs.next()) {
-                ResultSetMetaData metaData = rs.getMetaData();
+            while (resultSet.next()) {
+                ResultSetMetaData metaData = resultSet.getMetaData();
                 int columnCount = metaData.getColumnCount();
 
-                Class clazz = Class.forName(className);
-                Object obj = clazz.newInstance();
-
+                T temp = clazz.newInstance();
                 for (int i = 1; i <= columnCount; i++) {
 
                     String columnLabel = metaData.getColumnLabel(i);
-
                     Field field = clazz.getDeclaredField(columnLabel);
 
                     field.setAccessible(true);
-                    Object object1 = rs.getObject(i);
+                    Object columnValue = resultSet.getObject(i);
 
-                    field.set(obj, object1);
+                    field.set(temp, columnValue);
                 }
-                product = (Product) obj;
-                products.add(product);
-            }
-            rs.close();
 
-            return products;
+                object = temp;
+                objects.add(object);
+            }
+
+            return objects;
         }
     }
 }
